@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <style>
+        body {
+          background-color: #eef5f0;
+          min-width: 370px;
+          }
+          .task{
+            background-color: #ffffff;
+            padding: 8px;
+            margin: 12px;
+            box-shadow: 0 5px 10px #9769ca;
+            border-radius: 10px;
+            height: 60px;
+            transition: all 500ms ease;
+            overflow: hidden;
+            word-wrap:break-word
+          }
+          .task:hover{
+            background-color: #e9e9e9;
+            box-shadow: 0 5px 25px #7c4eb1;
+          }
+          svg{
+            pointer-events: none;
+          }
+          h5:nth-child{
+	          background: skyblue;
+          }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">To~Do</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="navbar-nav me-auto my-2 my-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="addTask_link" data-bs-toggle="modal" data-bs-target="#addTask_modal">Добавить заметку</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Сортировать..
+          </a>
+          <ul class="dropdown-menu" id="sortMenu">
+            <li><a class="dropdown-item" href="/task_name" order="task_name">В алфавитном порядке (А..Я)</a></li>
+            <li><a class="dropdown-item" href="/task_name%20DESC" order="task_name DESC">В алфавитном порядке (Я..А)</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/createdAt" order="createdAt">По дате добавления (сначала старые)</a></li>
+            <li><a class="dropdown-item" href="/createdAt%20DESC" order="createdAt DESC">По дате добавления (сначала новые)</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/updatedAt" order="updatedAt">По дате изменения (сначала старые)</a></li>
+            <li><a class="dropdown-item" href="/updatedAt%20DESC" order="updatedAt DESC">По дате изменения (сначала новые)</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="download_content" data-bs-target="#downloadTasks_modal" data-bs-toggle="modal">Скачать в .txt</a>
+        </li>
+      </ul>
+      <form name="search" class="d-flex" method="post" action="/search" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search" name="searchValue" value="{{srcVal}}">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!--     К О Н Т Е Н Т     -->
+    <div class="container">
+        {{#each tasks}}
+        <div class="task row" data-bs-toggle="modal" data-bs-target="#viewTask_modal" style="position: relative;">
+          <div class="col-8 col-sm-9 col-lg-10 col-xl-10 col-xxl-11" style="overflow: hidden;">
+            <h5 style="word-wrap:break-word;">{{this.task_name}}</h5>
+            <p style="font-size: 10px; word-wrap:break-word">{{this.task_description}}</p>
+            <p style="display: none;">{{this.createdAt}}</p>
+          </div>
+          <div class="col">
+            <div class="btn-group" style="position: absolute; right:6px; top: 6px;">
+              <button class="btn btn-lg btn-warning editBtn" data-bs-target="#editTask_modal" data-bs-toggle="modal" btnId="{{this.id}}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                </svg>
+              </button>
+              <button class="btn btn-lg btn-danger deleteBtn" btnId="{{this.id}}"> 
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                  <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+    </div>
+
+<!--     М О Д А Л Ь Н Ы Е   О К Н А     -->
+<!-- добавление нового элемента -->
+<div class="modal fade" id="addTask_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        Добавление Заметки
+      </div>
+      <div class="modal-body">
+        <form method="post" action="/create">
+          <input class="form-control" name="task_name" type="text" placeholder="Название"><br>
+          <textarea class="form-control" name="task_description" placeholder="Содержание"></textarea><br>
+          <input class="btn btn-success" type="submit" value="Добавить" />
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- редактирование элемента -->
+<div class="modal fade" id="editTask_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        Редактирование заметки
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="/edit" name="editForm">
+          <input type="text" name="id" style="display: none;">
+          <input class="form-control" name="task_name" type="text" placeholder="Название"><br>
+          <textarea class="form-control" name="task_description" placeholder="Содержание" rows="6"></textarea><br>
+          <input class="btn btn-success" type="submit" value="Сохранить">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- отображение элемента -->
+<div class="modal fade" id="viewTask_modal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" id="viewTask_modal_content">
+      <div class="modal-header" style="word-wrap:break-word;">
+      </div>
+      <div class="modal-body" style="word-wrap:break-word;">
+      </div>
+      <div class="modal-footer" style="opacity: 0.5; word-wrap:break-word;">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- скачивание списка заметок -->
+<div class="modal fade" id="downloadTasks_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        Скачать в .txt
+      </div>
+      <div class="modal-body">
+        <form method="post" action="/download">
+          <input class="form-control" name="filename" type="text" placeholder="Название файла">
+          <div class="form-text">
+            Введите название файла, куда необходимо скачать содержимое страницы
+          </div><br>
+          <input class="btn btn-success" type="submit" value="Отправить" />
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+<script>
+  // У Д А Л Е Н И Е
+  const deleteBtn = document.querySelectorAll(".deleteBtn");
+  deleteBtn.forEach((btn) => {
+    btn.addEventListener('click', e => {
+      e.stopImmediatePropagation();
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/delete';
+      form.innerHTML = `<input type="text" name="id" value="${e.target.getAttribute('btnId')}">`;
+      document.body.append(form);
+      console.log(form);
+      form.submit();
+      form.remove();
+      })
+    })
+  
+  // Р Е Д А К Т И Р О В А Н И Е
+  const editBtn = document.querySelectorAll(".editBtn");
+  editBtn.forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      let task_id = e.target.getAttribute("btnId");
+      let task_content = e.target.parentNode.parentNode.parentNode.childNodes[1].childNodes;
+      const editForm = document.forms.editForm;
+      editForm.elements.id.value = task_id;
+      editForm.elements.task_name.value = task_content[1].innerHTML;
+      editForm.elements.task_description.value = task_content[3].innerHTML;
+    })
+  })
+
+  // О Т О Б Р А Ж Е Н И Е
+  const tasks = document.querySelectorAll(".task");
+  const viewTaskModalContent = document.querySelector("#viewTask_modal_content")
+  tasks.forEach(elem => elem.addEventListener("click", e => {
+    let elem_header = elem.childNodes[1].childNodes[1].innerHTML;
+    let elem_description = elem.childNodes[1].childNodes[3].innerHTML;
+    let elem_createdAt = elem.childNodes[1].childNodes[5].innerHTML;
+    viewTaskModalContent.childNodes[1].innerHTML = "<h5>" + elem_header + "<h5>";
+    viewTaskModalContent.childNodes[3].innerHTML = elem_description.split("\n").join("<br>");
+    viewTaskModalContent.childNodes[5].innerHTML = elem_createdAt;
+  }))
+
+  // П О И С К
+  const searchInp = document.querySelector("#search");
+  searchInp.addEventListener('change', (e) => {
+    document.forms.search.submit();
+  })
+
+</script>
+</html>
