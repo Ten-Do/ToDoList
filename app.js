@@ -93,6 +93,7 @@ app.get("/:order", (request, response) => {
     .then(data => {
         response.render("index.hbs", {
             tasks: data
+            srcVal: search_value
         })
     })
     .catch((err) => console.log(err));
