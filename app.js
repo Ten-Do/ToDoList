@@ -83,6 +83,9 @@ app.get("/", (request, response) => {
 
 app.get("/:order", (request, response) => {
     const order = request.params.order;
+    if (order == 'favicon.ico'){
+        return;
+    }
     db.query(`SELECT * FROM (${SQL}) ORDER BY ${order}`, {  // для того чтобы сортировать те данные которые были выбраны ранее (например при помощи функции поиска)
         raw: true,
         type: Sequelize.QueryTypes.SELECT
