@@ -92,7 +92,7 @@ app.get("/:order", (request, response) => {
     })
     .then(data => {
         response.render("index.hbs", {
-            tasks: data
+            tasks: data,
             srcVal: search_value
         })
     })
